@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pratyansh Prateek — Resume</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --pink:#ff2d78;--cyan:#00f5ff;--yellow:#ffe600;--orange:#ff6b00;
+  --green:#39ff14;--red:#ff3333;
+  --bg:#0a0a0f;--card:#0f0f1a;--card2:#12121f;
+  --fg:#f0eee8;--muted:#7a7a9a;--grid:rgba(0,245,255,0.04);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:'Barlow',sans-serif;font-weight:300;line-height:1.6;overflow-x:hidden;cursor:crosshair}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px);pointer-events:none;z-index:1}
+.blob{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;opacity:.12}
+.b1{width:400px;height:400px;background:var(--pink);top:-100px;right:-100px}
+.b2{width:300px;height:300px;background:var(--cyan);bottom:200px;left:-80px}
+.corner{position:fixed;z-index:10;animation:pulse 3s ease infinite}
+.c1{top:24px;right:24px;width:44px;height:44px;border-top:2px solid var(--pink);border-right:2px solid var(--pink);opacity:.5}
+.c2{bottom:24px;left:24px;width:44px;height:44px;border-bottom:2px solid var(--cyan);border-left:2px solid var(--cyan);opacity:.5;animation-delay:1.5s}
+.page{max-width:960px;margin:0 auto;padding:0 24px 80px;position:relative;z-index:2}
+
+/* ═══ BOOT SCREEN ═══ */
+#boot{position:fixed;inset:0;background:#000;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;transition:opacity .8s ease}
+#boot.hide{opacity:0;pointer-events:none}
+.boot-logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,8vw,80px);letter-spacing:.1em;color:var(--pink);text-shadow:0 0 40px rgba(255,45,120,.6)}
+.boot-logo span{color:var(--cyan)}
+#boot-text{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--green);letter-spacing:.12em;min-height:1.4em;text-align:center;max-width:500px}
+.boot-bar-wrap{width:280px;height:4px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15)}
+#boot-bar{height:100%;width:0%;background:var(--pink);transition:width .05s linear;box-shadow:0 0 8px var(--pink)}
+.boot-skip{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.15em;margin-top:8px;cursor:pointer;transition:color .2s}
+.boot-skip:hover{color:var(--cyan)}
+
+/* ═══ GTA HUD (bottom right) ═══ */
+#hud{
+  position:fixed;bottom:28px;right:28px;z-index:500;
+  display:flex;flex-direction:column;align-items:flex-end;gap:8px;
+  font-family:'Share Tech Mono',monospace;
+}
+.hud-map{
+  width:110px;height:110px;background:rgba(0,0,0,.7);
+  border:1px solid rgba(255,255,255,.15);border-radius:50%;
+  position:relative;overflow:hidden;margin-bottom:4px;
+}
+.hud-map-bg{width:100%;height:100%;background:radial-gradient(circle,#0d1a0d 0%,#060f06 100%)}
+.hud-dot{position:absolute;top:50%;left:50%;width:6px;height:6px;background:var(--cyan);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 6px var(--cyan);animation:pulse 2s ease infinite}
+.hud-map-ring{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(0,245,255,.2)}
+/* grid lines on minimap */
+.hud-map::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,245,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,255,.05) 1px,transparent 1px);background-size:22px 22px;border-radius:50%}
+
+.hud-bars{display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+.hud-bar-row{display:flex;align-items:center;gap:6px}
+.hud-bar-label{font-size:9px;letter-spacing:.1em;color:rgba(255,255,255,.5);text-transform:uppercase}
+.hud-bar-track{width:80px;height:8px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15);position:relative;overflow:hidden}
+.hud-bar-fill{height:100%;position:absolute;left:0;top:0;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.hud-bar-fill.green{background:var(--green);box-shadow:0 0 6px rgba(57,255,20,.5)}
+.hud-bar-fill.cyan{background:var(--cyan);box-shadow:0 0 6px rgba(0,245,255,.5)}
+.hud-bar-fill.yellow{background:var(--yellow);box-shadow:0 0 6px rgba(255,230,0,.5)}
+.hud-bar-fill.pink{background:var(--pink);box-shadow:0 0 6px rgba(255,45,120,.5)}
+
+.hud-wanted{display:flex;gap:4px;margin-top:2px}
+.star{font-size:14px;color:rgba(255,255,255,.15);transition:color .3s,text-shadow .3s;line-height:1}
+.star.lit{color:var(--yellow);text-shadow:0 0 8px rgba(255,230,0,.8)}
+
+.hud-cash{font-size:20px;letter-spacing:.04em;color:var(--green);text-shadow:0 0 10px rgba(57,255,20,.4);text-align:right}
+.hud-cash-label{font-size:8px;color:rgba(57,255,20,.5);letter-spacing:.15em;text-align:right;margin-bottom:1px}
+
+/* ═══ HERO ═══ */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:60px 0 40px;position:relative}
+.hero-tag{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--cyan);letter-spacing:.25em;text-transform:uppercase;margin-bottom:16px;opacity:0;animation:fadeUp .6s ease .2s forwards}
+.hero-tag em{color:var(--pink);font-style:normal}
+.hero-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(64px,12vw,140px);line-height:.9;letter-spacing:.02em;color:var(--fg);opacity:0;animation:fadeUp .7s ease .4s forwards}
+.hero-name .outline{-webkit-text-stroke:2px var(--pink);color:transparent;display:block}
+.hero-sub{font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,3vw,28px);letter-spacing:.15em;color:var(--yellow);margin-top:12px;opacity:0;animation:fadeUp .7s ease .6s forwards}
+.blink{display:inline-block;width:3px;height:.9em;background:var(--cyan);vertical-align:middle;margin-left:4px;animation:blink 1s step-end infinite}
+.hero-bio{max-width:560px;font-size:15px;color:#a0a0c0;margin-top:24px;line-height:1.8;border-left:2px solid var(--pink);padding-left:16px;opacity:0;animation:fadeUp .7s ease .8s forwards}
+.hero-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px;opacity:0;animation:fadeUp .7s ease 1s forwards}
+.chip{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.1em;padding:8px 16px;border:1px solid rgba(0,245,255,.25);color:var(--cyan);text-decoration:none;transition:all .2s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)}
+.chip:hover{background:rgba(0,245,255,.1);border-color:var(--cyan);box-shadow:0 0 16px rgba(0,245,255,.2)}
+.scroll-hint{position:absolute;bottom:32px;left:0;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.2em;display:flex;align-items:center;gap:10px;animation:pulse 2s ease infinite}
+.scroll-hint::before{content:'';display:block;width:32px;height:1px;background:var(--muted)}
+
+/* ═══ SECTIONS ═══ */
+section{margin-top:80px}
+.sec-label{display:flex;align-items:center;gap:16px;margin-bottom:32px}
+.sec-label .num{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--pink);letter-spacing:.15em}
+.sec-label h2{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:.08em;color:var(--fg);line-height:1}
+.sec-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(255,45,120,.5),transparent)}
+
+/* EXP */
+.exp-card{background:var(--card);border:1px solid rgba(255,45,120,.15);padding:28px;margin-bottom:16px;position:relative;transition:border-color .2s;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px))}
+.exp-card:hover{border-color:rgba(255,45,120,.5)}
+.exp-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg,var(--pink),transparent)}
+.exp-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.exp-co{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;color:var(--pink)}
+.exp-date{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan);letter-spacing:.1em;background:rgba(0,245,255,.06);padding:4px 10px;border:1px solid rgba(0,245,255,.15)}
+.exp-role{font-size:12px;font-weight:600;color:var(--yellow);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
+.exp-list{list-style:none;padding:0}
+.exp-list li{font-size:14px;color:#9090b0;padding:4px 0 4px 20px;position:relative;line-height:1.6}
+.exp-list li::before{content:'▶';position:absolute;left:0;color:var(--pink);font-size:10px;top:6px}
+.exp-list li strong{color:var(--fg);font-weight:600}
+
+/* PROJECTS */
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.proj-card{background:var(--card2);border:1px solid rgba(0,245,255,.1);padding:24px;position:relative;transition:all .25s;overflow:hidden}
+.proj-card::after{content:'';position:absolute;bottom:0;right:0;width:48px;height:48px;border-bottom:2px solid var(--cyan);border-right:2px solid var(--cyan);opacity:.3;transition:opacity .2s}
+.proj-card:hover{border-color:rgba(0,245,255,.4);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,245,255,.06)}
+.proj-card:hover::after{opacity:1}
+.proj-icon{font-size:26px;margin-bottom:12px;display:block}
+.proj-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.06em;color:var(--fg);margin-bottom:8px;line-height:1.1}
+.proj-tech{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tag{font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 8px;border:1px solid rgba(255,107,0,.4);color:var(--orange);letter-spacing:.05em}
+.proj-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.proj-links{display:flex;gap:10px}
+.plink{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,245,255,.3);padding-bottom:1px;transition:border-color .2s}
+.plink:hover{border-color:var(--cyan)}
+
+/* ═══ RPG PLAYER STATS PANEL ═══ */
+.rpg-panel{background:var(--card);border:1px solid rgba(57,255,20,.2);padding:28px;position:relative;overflow:hidden;margin-bottom:0}
+.rpg-panel::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg,var(--green),transparent)}
+.rpg-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.rpg-identity{}
+.rpg-name{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.08em;color:var(--green)}
+.rpg-class{font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(57,255,20,.6);letter-spacing:.15em;text-transform:uppercase}
+.rpg-level{text-align:right}
+.rpg-lvl-num{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:1;color:var(--yellow)}
+.rpg-lvl-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(255,230,0,.5);letter-spacing:.2em;text-align:right}
+.rpg-xp-wrap{margin-bottom:24px}
+.rpg-xp-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.15em;margin-bottom:6px;display:flex;justify-content:space-between}
+.rpg-xp-track{height:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);position:relative;overflow:hidden}
+.rpg-xp-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--yellow),var(--orange));box-shadow:0 0 8px rgba(255,107,0,.6);transition:width 1.5s cubic-bezier(.4,0,.2,1)}
+.rpg-attrs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:500px){.rpg-attrs{grid-template-columns:1fr}}
+.rpg-attr{}
+.rpg-attr-head{display:flex;justify-content:space-between;margin-bottom:5px}
+.rpg-attr-name{font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.1em;text-transform:uppercase}
+.rpg-attr-val{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.06em}
+.rpg-attr-track{height:5px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);overflow:hidden}
+.rpg-attr-fill{height:100%;width:0%;transition:width 1.3s cubic-bezier(.4,0,.2,1)}
+.attr-g{color:var(--green)}.attr-g .rpg-attr-fill{background:var(--green);box-shadow:0 0 4px rgba(57,255,20,.5)}
+.attr-c{color:var(--cyan)}.attr-c .rpg-attr-fill{background:var(--cyan);box-shadow:0 0 4px rgba(0,245,255,.5)}
+.attr-y{color:var(--yellow)}.attr-y .rpg-attr-fill{background:var(--yellow);box-shadow:0 0 4px rgba(255,230,0,.5)}
+.attr-p{color:var(--pink)}.attr-p .rpg-attr-fill{background:var(--pink);box-shadow:0 0 4px rgba(255,45,120,.5)}
+.attr-o{color:var(--orange)}.attr-o .rpg-attr-fill{background:var(--orange);box-shadow:0 0 4px rgba(255,107,0,.5)}
+.attr-w{color:#c0c0ff}.attr-w .rpg-attr-fill{background:#c0c0ff;box-shadow:0 0 4px rgba(192,192,255,.5)}
+
+.rpg-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;padding-top:20px;border-top:1px solid rgba(57,255,20,.1)}
+.badge{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.1em;padding:4px 10px;border:1px solid;text-transform:uppercase}
+.badge-gold{border-color:rgba(255,230,0,.4);color:var(--yellow);background:rgba(255,230,0,.05)}
+.badge-cyan{border-color:rgba(0,245,255,.3);color:var(--cyan);background:rgba(0,245,255,.05)}
+.badge-pink{border-color:rgba(255,45,120,.3);color:var(--pink);background:rgba(255,45,120,.05)}
+
+/* ═══ SKILLS ═══ */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.skill-group{background:var(--card);border:1px solid rgba(255,230,0,.1);padding:20px;transition:border-color .2s}
+.skill-group:hover{border-color:rgba(255,230,0,.35)}
+.sg-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.12em;color:var(--yellow);margin-bottom:12px}
+.pill-wrap{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-size:12px;color:#a0a0c0;background:rgba(255,255,255,.04);padding:4px 10px;border:1px solid rgba(255,255,255,.08);transition:all .15s}
+.pill:hover{color:var(--fg);border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.07)}
+
+/* CERTS */
+.certs-row{display:flex;flex-wrap:wrap;gap:12px}
+.cert{background:var(--card);border:1px solid rgba(255,45,120,.15);padding:16px 22px;flex:1;min-width:240px;position:relative;overflow:hidden}
+.cert::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,var(--pink),transparent)}
+.cert-name{font-size:14px;font-weight:600;color:var(--fg);margin-bottom:4px}
+.cert-src{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.08em}
+
+/* EDUCATION */
+.edu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.edu-card{background:var(--card);border:1px solid rgba(0,245,255,.1);padding:22px;clip-path:polygon(0 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%);transition:border-color .2s}
+.edu-card:hover{border-color:rgba(0,245,255,.35)}
+.edu-deg{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:var(--cyan);margin-bottom:4px}
+.edu-school{font-size:13px;color:var(--fg);margin-bottom:8px;line-height:1.4}
+.edu-meta{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.08em}
+.edu-grade{display:inline-block;margin-top:8px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--yellow);background:rgba(255,230,0,.07);padding:3px 10px;border:1px solid rgba(255,230,0,.2)}
+
+/* FOOTER */
+.footer{margin-top:100px;padding-top:32px;border-top:1px solid rgba(255,45,120,.15);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.footer-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;color:var(--muted)}
+.footer-note{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.12em}
+
+/* NOTIFICATION TOAST */
+#notif{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-80px);z-index:600;background:rgba(10,10,15,.95);border:1px solid rgba(57,255,20,.4);padding:10px 20px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--green);letter-spacing:.1em;white-space:nowrap;transition:transform .4s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 0 20px rgba(57,255,20,.15)}
+#notif::before{content:'&#9650; ';color:var(--yellow)}
+#notif.show{transform:translateX(-50%) translateY(0)}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes dotMove{0%{transform:translate(-50%,-50%) translate(0,0)}25%{transform:translate(-50%,-50%) translate(8px,-6px)}50%{transform:translate(-50%,-50%) translate(-5px,8px)}75%{transform:translate(-50%,-50%) translate(6px,5px)}100%{transform:translate(-50%,-50%) translate(0,0)}}
+
+.hud-dot{animation:dotMove 8s ease infinite,pulse 2s ease infinite!important}
+
+@media(max-width:600px){
+  .hero-name{font-size:64px}
+  .exp-head{flex-direction:column}
+  .footer{flex-direction:column;align-items:flex-start}
+  #hud{display:none}
+}
+@media(max-width:768px){
+  #hud .hud-map{width:80px;height:80px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ BOOT SCREEN ═══ -->
+<div id="boot">
+  <div class="boot-logo">PLAYER<span>CARD</span></div>
+  <div id="boot-text">&nbsp;</div>
+  <div class="boot-bar-wrap"><div id="boot-bar"></div></div>
+  <div class="boot-skip" onclick="skipBoot()">[ PRESS ANY KEY TO SKIP ]</div>
+</div>
+
+<!-- ═══ GTA HUD ═══ -->
+<div id="hud">
+  <div class="hud-map">
+    <div class="hud-map-bg"></div>
+    <div class="hud-map-ring"></div>
+    <div class="hud-dot"></div>
+  </div>
+  <div class="hud-cash-label">NET WORTH</div>
+  <div class="hud-cash">$HIRE_ME</div>
+  <div class="hud-bars">
+    <div class="hud-bar-row">
+      <span class="hud-bar-label">HEALTH</span>
+      <div class="hud-bar-track"><div class="hud-bar-fill green" style="width:92%"></div></div>
+    </div>
+    <div class="hud-bar-row">
+      <span class="hud-bar-label">STAMINA</span>
+      <div class="hud-bar-track"><div class="hud-bar-fill cyan" style="width:85%"></div></div>
+    </div>
+    <div class="hud-bar-row">
+      <span class="hud-bar-label">SKILL</span>
+      <div class="hud-bar-track"><div class="hud-bar-fill yellow" style="width:78%"></div></div>
+    </div>
+    <div class="hud-bar-row">
+      <span class="hud-bar-label">WANTED</span>
+      <div class="hud-bar-track"><div class="hud-bar-fill pink" style="width:20%"></div></div>
+    </div>
+  </div>
+  <div class="hud-wanted">
+    <span class="star lit">&#9733;</span>
+    <span class="star">&#9733;</span>
+    <span class="star">&#9733;</span>
+    <span class="star">&#9733;</span>
+    <span class="star">&#9733;</span>
+  </div>
+</div>
+
+<!-- NOTIFICATION TOAST -->
+<div id="notif">ACHIEVEMENT UNLOCKED: RESUME VIEWED</div>
+
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="corner c1"></div>
+<div class="corner c2"></div>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <p class="hero-tag">// PLAYER PROFILE <em>LOADED</em></p>
+    <h1 class="hero-name">
+      Pratyansh<br>
+      <span class="outline">Prateek</span>
+    </h1>
+    <p class="hero-sub">Final Year CSE &nbsp;&middot;&nbsp; Game Dev &nbsp;&middot;&nbsp; ML Engineer<span class="blink"></span></p>
+    <p class="hero-bio">
+      Final-year B.Tech CSE student obsessed with building things &mdash; from low-level 2D physics engines
+      and collision systems to ML models and full-stack web apps. Currently researching Vision
+      Transformers at IIIT Ranchi. Seeking a team to ship something real.
+    </p>
+    <div class="hero-links">
+      <a class="chip" href="mailto:pratyanshprateek012@gmail.com">&#10003; EMAIL</a>
+      <a class="chip" href="tel:+916200711042">&#9990; +91 6200 711 042</a>
+      <a class="chip" href="https://linkedin.com/in/pratyansh-prateek/" target="_blank">in LINKEDIN</a>
+      <a class="chip" href="https://github.com/Pratyanshprateek" target="_blank">&#9670; GITHUB</a>
+    </div>
+    <p class="scroll-hint">SCROLL DOWN</p>
+  </div>
+
+  <!-- EXPERIENCE -->
+  <section class="reveal">
+    <div class="sec-label">
+      <span class="num">01 //</span>
+      <h2>Experience</h2>
+    </div>
+    <div class="exp-card">
+      <div class="exp-head">
+        <span class="exp-co">IIIT Ranchi</span>
+        <span class="exp-date">JAN 2026 &rarr; PRESENT</span>
+      </div>
+      <p class="exp-role">Research Intern &mdash; Vision Transformers for Medical Image Classification</p>
+      <ul class="exp-list">
+        <li>Researching <strong>Vision Transformers (ViT)</strong> for medical image classification, exploring self-attention mechanisms for improved diagnostic accuracy</li>
+        <li>Preprocessing and augmenting medical imaging datasets; fine-tuning transformer architectures using <strong>TensorFlow</strong> and <strong>Keras</strong></li>
+        <li>Benchmarking ViT performance against CNN baselines (<strong>MobileNetV2, ResNet</strong>) on multi-class classification tasks</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- RPG PLAYER STATS -->
+  <section class="reveal">
+    <div class="sec-label">
+      <span class="num">&#9670;&#9670; //</span>
+      <h2>Player Stats</h2>
+    </div>
+    <div class="rpg-panel">
+      <div class="rpg-header">
+        <div class="rpg-identity">
+          <div class="rpg-name">Pratyansh Prateek</div>
+          <div class="rpg-class">&#9670; Dev Class: Full-Stack / ML / Systems</div>
+        </div>
+        <div class="rpg-level">
+          <div class="rpg-lvl-num">22</div>
+          <div class="rpg-lvl-label">CURRENT LEVEL</div>
+        </div>
+      </div>
+      <div class="rpg-xp-wrap">
+        <div class="rpg-xp-label"><span>XP PROGRESS</span><span>FINAL YEAR — 78% TO GRADUATION</span></div>
+        <div class="rpg-xp-track"><div class="rpg-xp-fill" data-width="78"></div></div>
+      </div>
+      <div class="rpg-attrs">
+        <div class="rpg-attr attr-g">
+          <div class="rpg-attr-head">
+            <span class="rpg-attr-name">&#9881; Physics Engine</span>
+            <span class="rpg-attr-val">88</span>
+          </div>
+          <div class="rpg-attr-track"><div class="rpg-attr-fill" data-width="88"></div></div>
+        </div>
+        <div class="rpg-attr attr-c">
+          <div class="rpg-attr-head">
+            <span class="rpg-attr-name">&#9670; Machine Learning</span>
+            <span class="rpg-attr-val">82</span>
+          </div>
+          <div class="rpg-attr-track"><div class="rpg-attr-fill" data-width="82"></div></div>
+        </div>
+        <div class="rpg-attr attr-y">
+          <div class="rpg-attr-head">
+            <span class="rpg-attr-name">&#9632; C / C++</span>
+            <span class="rpg-attr-val">85</span>
+          </div>
+          <div class="rpg-attr-track"><div class="rpg-attr-fill" data-width="85"></div></div>
+        </div>
+        <div class="rpg-attr attr-p">
+          <div class="rpg-attr-head">
+            <span class="rpg-attr-name">&#9650; Web Dev</span>
+            <span class="rpg-attr-val">75</span>
+          </div>
+          <div class="rpg-attr-track"><div class="rpg-attr-fill" data-width="75"></div></div>
+        </div>
+        <div class="rpg-attr attr-o">
+          <div class="rpg-attr-head">
+            <span class="rpg-attr-name">&#9830; Problem Solving</span>
+            <span class="rpg-attr-val">90</span>
+          </div>
+          <div class="rpg-attr-track"><div class="rpg-attr-fill" data-width="90"></div></div>
+        </div>
+        <div class="rpg-attr attr-w">
+          <div class="rpg-attr-head">
+            <span class="rpg-attr-name">&#9670; Vision Transformers</span>
+            <span class="rpg-attr-val">70</span>
+          </div>
+          <div class="rpg-attr-track"><div class="rpg-attr-fill" data-width="70"></div></div>
+        </div>
+      </div>
+      <div class="rpg-badges">
+        <span class="badge badge-gold">&#9733; Physics Architect</span>
+        <span class="badge badge-cyan">&#9670; ViT Researcher</span>
+        <span class="badge badge-pink">&#9658; ML Practitioner</span>
+        <span class="badge badge-gold">&#9632; Full-Stack Builder</span>
+        <span class="badge badge-cyan">&#9830; IIIT Research Fellow</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="reveal">
+    <div class="sec-label">
+      <span class="num">02 //</span>
+      <h2>Projects</h2>
+    </div>
+    <div class="proj-grid">
+      <div class="proj-card">
+        <span class="proj-icon">&#9881;</span>
+        <p class="proj-title">2D Physics Engine with CCD</p>
+        <div class="proj-tech">
+          <span class="tag">C++</span><span class="tag">AABB</span><span class="tag">Rigid Body</span><span class="tag">TOI</span>
+        </div>
+        <p class="proj-desc">Custom 2D rigid body physics engine with Continuous Collision Detection using Swept AABB and Time of Impact. Handles circle&ndash;circle, circle&ndash;polygon, and polygon&ndash;polygon collisions.</p>
+        <div class="proj-links"><a class="plink" href="https://github.com/Pratyanshprateek" target="_blank">&rarr; GITHUB</a></div>
+      </div>
+      <div class="proj-card">
+        <span class="proj-icon">&#128062;</span>
+        <p class="proj-title">Dog Breed Classifier</p>
+        <div class="proj-tech">
+          <span class="tag">TensorFlow</span><span class="tag">Keras</span><span class="tag">MobileNetV2</span>
+        </div>
+        <p class="proj-desc">End-to-end deep learning web app classifying 120+ dog breeds from uploaded images. Fine-tuned MobileNetV2 from TensorFlow Hub on a labelled multi-class dataset.</p>
+        <div class="proj-links">
+          <a class="plink" href="https://github.com/Pratyanshprateek" target="_blank">&rarr; GITHUB</a>
+          <a class="plink" href="#" target="_blank">&rarr; DEMO</a>
+        </div>
+      </div>
+      <div class="proj-card">
+        <span class="proj-icon">&#9835;</span>
+        <p class="proj-title">Spotify Clone</p>
+        <div class="proj-tech">
+          <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span>
+        </div>
+        <p class="proj-desc">Feature-complete Spotify UI clone with play, pause, forward, backward, and track selection. Clean vanilla front-end with seamless user experience.</p>
+        <div class="proj-links">
+          <a class="plink" href="https://github.com/Pratyanshprateek" target="_blank">&rarr; GITHUB</a>
+          <a class="plink" href="#" target="_blank">&rarr; DEMO</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="reveal">
+    <div class="sec-label">
+      <span class="num">03 //</span>
+      <h2>Skills</h2>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-group">
+        <p class="sg-title">Languages</p>
+        <div class="pill-wrap">
+          <span class="pill">C/C++</span><span class="pill">Python</span><span class="pill">JavaScript</span><span class="pill">Java</span><span class="pill">HTML/CSS</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <p class="sg-title">Game Dev &amp; Systems</p>
+        <div class="pill-wrap">
+          <span class="pill">2D Physics</span><span class="pill">Collision Detection</span><span class="pill">AABB / CCD</span><span class="pill">Rigid Body Dynamics</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <p class="sg-title">AI / ML</p>
+        <div class="pill-wrap">
+          <span class="pill">TensorFlow</span><span class="pill">Keras</span><span class="pill">Scikit-learn</span><span class="pill">Pandas</span><span class="pill">NumPy</span><span class="pill">Matplotlib</span><span class="pill">LLMs</span><span class="pill">Gemini Pro API</span><span class="pill">Vision Transformers</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <p class="sg-title">Web &amp; Tools</p>
+        <div class="pill-wrap">
+          <span class="pill">Full-Stack Dev</span><span class="pill">REST APIs</span><span class="pill">Responsive Design</span><span class="pill">Git / GitHub</span><span class="pill">Docker</span><span class="pill">MySQL</span><span class="pill">Postman</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CERTIFICATIONS -->
+  <section class="reveal">
+    <div class="sec-label">
+      <span class="num">04 //</span>
+      <h2>Certifications</h2>
+    </div>
+    <div class="certs-row">
+      <div class="cert">
+        <p class="cert-name">AI / ML &amp; Data Science Bootcamp</p>
+        <p class="cert-src">UDEMY</p>
+      </div>
+      <div class="cert">
+        <p class="cert-name">Complete Full-Stack Web Development Bootcamp</p>
+        <p class="cert-src">UDEMY</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section class="reveal">
+    <div class="sec-label">
+      <span class="num">05 //</span>
+      <h2>Education</h2>
+    </div>
+    <div class="edu-grid">
+      <div class="edu-card">
+        <p class="edu-deg">B.Tech &mdash; CSE</p>
+        <p class="edu-school">Sikkim Manipal Institute of Technology, Majitar</p>
+        <p class="edu-meta">2022 &rarr; 2026 (Expected)</p>
+        <span class="edu-grade">CGPA: 6.43 (Pursuing)</span>
+      </div>
+      <div class="edu-card">
+        <p class="edu-deg">Class XII &mdash; PCM</p>
+        <p class="edu-school">Aditya Birla Public School, Rehla</p>
+        <p class="edu-meta">2020</p>
+        <span class="edu-grade">71.2%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div class="footer reveal">
+    <span class="footer-name">PRATYANSH PRATEEK</span>
+    <span class="footer-note">// GAME OVER? NAH. JUST GETTING STARTED.</span>
+  </div>
+
+</div>
+
+<script>
+/* ── BOOT SCREEN ── */
+const bootLines = [
+  'INITIALIZING PLAYER DATA...',
+  'LOADING SKILL TREE...',
+  'SYNCING GITHUB COMMITS...',
+  'CALIBRATING PHYSICS ENGINE...',
+  'DEPLOYING ML MODELS...',
+  'PLAYER PROFILE READY.'
+];
+let bootDone = false;
+function skipBoot(){
+  bootDone = true;
+  document.getElementById('boot').classList.add('hide');
+  setTimeout(()=>{ document.getElementById('boot').style.display='none'; showNotif(); },800);
+}
+(function runBoot(){
+  const textEl = document.getElementById('boot-text');
+  const barEl  = document.getElementById('boot-bar');
+  let i = 0, progress = 0;
+  const step = 100 / bootLines.length;
+  function nextLine(){
+    if(bootDone) return;
+    if(i >= bootLines.length){ setTimeout(skipBoot, 400); return; }
+    textEl.textContent = bootLines[i];
+    i++;
+    progress = Math.min(100, progress + step);
+    barEl.style.width = progress + '%';
+    setTimeout(nextLine, 420);
+  }
+  setTimeout(nextLine, 300);
+  document.addEventListener('keydown', skipBoot, {once:true});
+  document.addEventListener('click', skipBoot, {once:true});
+})();
+
+/* ── ACHIEVEMENT TOAST ── */
+function showNotif(){
+  const n = document.getElementById('notif');
+  n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'), 3000);
+}
+
+/* ── SCROLL REVEAL ── */
+const reveals = document.querySelectorAll('.reveal');
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      obs.unobserve(e.target);
+      /* animate RPG bars when panel enters view */
+      e.target.querySelectorAll('.rpg-attr-fill, .rpg-xp-fill').forEach(bar=>{
+        const w = bar.dataset.width;
+        if(w) setTimeout(()=>{ bar.style.width = w + '%'; }, 200);
+      });
+    }
+  });
+},{threshold:0.15});
+reveals.forEach(r=>obs.observe(r));
+
+/* ── WANTED STARS on scroll ── */
+window.addEventListener('scroll',()=>{
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+  const lit = Math.ceil(pct * 5);
+  document.querySelectorAll('.star').forEach((s,i)=>{
+    s.classList.toggle('lit', i < lit);
+  });
+});
+</script>
+</body>
+</html>
