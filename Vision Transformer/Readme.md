@@ -33,19 +33,19 @@ Humne ek already-trained image model liya, usko chest X-ray task ke liye fine-tu
 
 ## 2. Project Files
 
-- [medical_image_classification_vit.ipynb](/Users/mayank/Downloads/Pratty-proj/vision_transformer/medical_image_classification_vit.ipynb)
+- [medical_image_classification_vit.ipynb](https://github.com/Pratyanshprateek/vision_transformer/blob/main/medical_image_classification_vit.ipynb)
 Main training notebook. Isme data loading, balancing, training, evaluation, saving, visualization sab hai.
 
-- [predict_single_xray.py](/Users/mayank/Downloads/Pratty-proj/vision_transformer/predict_single_xray.py)
+- [predict_single_xray.py](https://github.com/Pratyanshprateek/vision_transformer/blob/main/predict_single_xray.py)
 Ek standalone script jo trained checkpoint use karke single X-ray predict karta hai.
 
-- [README.md](/Users/mayank/Downloads/Pratty-proj/vision_transformer/README.md)
+- [README.md](https://github.com/Pratyanshprateek/vision_transformer/blob/main/README.md)
 Project usage guide.
 
-- [outputs/vit_chest_xray_classifier.pt](/Users/mayank/Downloads/Pratty-proj/vision_transformer/outputs/vit_chest_xray_classifier.pt)
+- outputs/vit_chest_xray_classifier.pt
 Saved trained model checkpoint.
 
-- [outputs/training_history.csv](/Users/mayank/Downloads/Pratty-proj/vision_transformer/outputs/training_history.csv)
+- outputs/training_history.csv
 Training metrics history.
 
 ---
