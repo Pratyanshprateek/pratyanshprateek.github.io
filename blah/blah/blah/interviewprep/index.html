@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PratStrike Project Q&A Guide</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.65;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+      background: #0f1117;
+      color: #f3f5f7;
+    }
+    h1, h2, h3 {
+      color: #8fd3ff;
+    }
+    .card {
+      background: #171b24;
+      border: 1px solid #283041;
+      border-radius: 14px;
+      padding: 20px;
+      margin: 18px 0;
+    }
+    .q {
+      color: #ffd166;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .a {
+      color: #f3f5f7;
+    }
+    code, pre {
+      background: #0b0d12;
+      color: #8ef0a7;
+      border-radius: 10px;
+    }
+    code {
+      padding: 2px 6px;
+    }
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+    .fun {
+      color: #ff9ecb;
+      font-style: italic;
+    }
+    .tag {
+      display: inline-block;
+      background: #243048;
+      color: #b8e1ff;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin: 4px 8px 4px 0;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>PratStrike Project Interview Guide</h1>
+  <p>
+    <strong>Goal:</strong> Yeh page aapka full project cheat-code hai. Agar koi pooche
+    <em>“yeh game kaise banaya?”</em>, <em>“AI kaise kaam karta hai?”</em>,
+    <em>“boss wave pe kya architecture tha?”</em>, ya <em>“C++ me game feel kaise achieve kiya?”</em>,
+    toh aap confidently answer kar sako.
+  </p>
+
+  <div class="card">
+    <h2>One-Line Intro</h2>
+    <p class="a">
+      <strong>PratStrike</strong> is a 2D top-down shooter built in <strong>C++ + SDL2</strong>,
+      focused on <strong>gameplay systems, combat feel, enemy AI, boss phases, collision handling,
+      menus, difficulty scaling, leaderboard persistence, and a complete playable loop</strong>.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Quick Tech Tags</h2>
+    <span class="tag">C++17</span>
+    <span class="tag">SDL2</span>
+    <span class="tag">SDL_image</span>
+    <span class="tag">SDL_mixer</span>
+    <span class="tag">SDL_ttf</span>
+    <span class="tag">ECS</span>
+    <span class="tag">Fixed Timestep</span>
+    <span class="tag">Quadtree</span>
+    <span class="tag">Boss AI</span>
+    <span class="tag">Game Feel</span>
+    <span class="tag">Leaderboards</span>
+  </div>
+
+  <h2>1. High-Level Story: How We Built This From Scratch</h2>
+
+  <div class="card">
+    <div class="q">Q: Project start ka thought process kya tha?</div>
+    <div class="a">
+      Sabse pehle idea simple tha: ek polished top-down shooter banana jo sirf “working game” na lage,
+      balki “haan bhai, isme feel hai” lage. Isliye start se hi focus 3 cheezon par tha:
+      architecture, combat systems, aur player feedback.
+      <br><br>
+      Humne pehle rendering aur engine shell banaya, phir ECS structure, phir movement/collision,
+      phir bullets/enemies, phir AI, phir boss, phir wave progression, phir menus/leaderboard/pause.
+      <br><br>
+      <span class="fun">Seedha boss se start karte toh boss bhi bolta “bhai pehle base toh bana lo.”</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Why C++ and SDL2?</div>
+    <div class="a">
+      C++ choose kiya because performance, memory awareness, and systems-level control chahiye tha.
+      SDL2 choose kiya because it gives enough low-level control without forcing a big engine workflow.
+      It handles windowing, input, rendering, audio, and fonts nicely, while the gameplay architecture
+      stays fully ours.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Final architecture kya bani?</div>
+    <div class="a">
+      Architecture roughly aise hai:
+      <br><br>
+      <strong>Engine</strong> handles app lifecycle and fixed-timestep loop.<br>
+      <strong>GameScene</strong> is the orchestrator.<br>
+      <strong>Registry/ECS</strong> stores entities + components.<br>
+      <strong>Systems</strong> handle one job each:
+      Input, Physics, Bullet, AI, Boss, Wave, Render, GameFeel helpers.
+      <br><br>
+      Isse coupling kam hota hai. Har system ka ek focused responsibility hai.
+    </div>
+  </div>
+
+  <h2>2. ECS Deep Explanation</h2>
+
+  <div class="card">
+    <div class="q">Q: Why ECS instead of classic OOP inheritance like Player : Character : Entity?</div>
+    <div class="a">
+      ECS is better when behavior is composition-based. Example:
+      player, enemy, bullet, pickup, boss, particle sab “different classes” nahi,
+      balki component combinations hain.
+      <br><br>
+      Example:
+      <br>
+      Player = Transform + Velocity + Health + Sprite + PlayerState + Tag
+      <br>
+      Bullet = Transform + Velocity + Collider + Bullet + Sprite + Tag
+      <br>
+      Boss = Transform + Velocity + Health + Collider + Boss + Sprite + Tag
+      <br><br>
+      Inheritance me jaldi spaghetti ban sakti thi. ECS me reusable data blocks aur clean system logic milta hai.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Registry ka role kya tha?</div>
+    <div class="a">
+      Registry entities banata/destroy karta hai aur component arrays manage karta hai.
+      Hamara ECS sparse-set style component storage use karta hai, jisme component lookups efficient hain
+      aur systems relevant component combinations par iterate kar sakte hain.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Typical ECS flow ka code example?</div>
+    <div class="a">
+      Example:
+      <pre><code>// entity create
+std::uint32_t enemyId = registry.createEntity();
+
+registry.addComponent(enemyId, TransformComponent{pos, pos, 0.0f, 0.0f});
+registry.addComponent(enemyId, VelocityComponent{Vector2(), 0.0f, 120.0f, 180.0f, 0.04f, 200.0f});
+registry.addComponent(enemyId, HealthComponent{60, 60, 0.0f, 0.12f, false});
+registry.addComponent(enemyId, TagComponent{TagComponent::Tag::Enemy});</code></pre>
+      Yeh flexible hai, aur systems fir <code>view&lt;TransformComponent, VelocityComponent&gt;()</code> pe operate karte hain.
+    </div>
+  </div>
+
+  <h2>3. Game Loop and Timing</h2>
+
+  <div class="card">
+    <div class="q">Q: Why fixed timestep use kiya?</div>
+    <div class="a">
+      Physics aur gameplay ko frame-rate independent banana tha. Agar variable timestep hota,
+      toh different machines par dash timing, collision consistency, fire cooldown, hitstop duration,
+      sab alag feel kar sakte the.
+      <br><br>
+      Isliye fixed update loop use kiya with something like:
+      <pre><code>while (accumulator >= FIXED_DT) {
+    onUpdate(FIXED_DT);
+    accumulator -= FIXED_DT;
+}
+float alpha = accumulator / FIXED_DT;
+onRender(alpha);</code></pre>
+      Yeh game logic ko stable rakhta hai aur rendering ko smooth banata hai.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Render interpolation kya karti hai?</div>
+    <div class="a">
+      Physics fixed steps me chal rahi hoti hai, but render har frame hota hai.
+      So we interpolate between previous and current position:
+      <pre><code>Vector2 renderPos = prevPosition.lerp(position, alpha);</code></pre>
+      Isse visuals smoother lagte hain, especially movement aur camera me.
+    </div>
+  </div>
+
+  <h2>4. Input and Player Movement</h2>
+
+  <div class="card">
+    <div class="q">Q: Player movement ka evolution kya tha?</div>
+    <div class="a">
+      Initially rotate-and-thrust style tha, but user feedback se clear hua ki top-down shooter me
+      direct directional movement chahiye. So movement change karke proper
+      <strong>WASD / Arrow key vector movement + mouse aim</strong> kiya.
+      <br><br>
+      Final behavior:
+      <br>
+      movement keys = position/movement vector
+      <br>
+      mouse = aim direction
+      <br>
+      left click/space = fire
+      <br>
+      shift = dash
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Dash ka implementation kaise kiya?</div>
+    <div class="a">
+      PlayerStateComponent me dash timer, cooldown, duration aur dash direction store kiya.
+      Jab dash trigger hota hai:
+      <pre><code>ps.isDashing = true;
+ps.dashTimer = ps.dashDuration;
+ps.dashCooldown = ps.dashCooldownMax;
+ps.dashDirection = movementDir;</code></pre>
+      Aur update me velocity temporarily high set hoti hai.
+    </div>
+  </div>
+
+  <h2>5. Physics and Collision</h2>
+
+  <div class="card">
+    <div class="q">Q: PhysicsSystem kya handle karta hai?</div>
+    <div class="a">
+      PhysicsSystem handles:
+      <br>
+      movement integration
+      <br>
+      friction
+      <br>
+      world bounds clamping
+      <br>
+      i-frame timer update
+      <br>
+      quadtree rebuild
+      <br>
+      collision detection
+      <br>
+      collision event generation
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Collision detection brute-force kyun nahi?</div>
+    <div class="a">
+      Bullets, enemies, pickups, player, boss sab ka pairwise check karna expensive ho sakta tha.
+      Isliye Quadtree use kiya to spatially partition colliders and query nearby objects only.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Boss wave pe crash kyun hua tha?</div>
+    <div class="a">
+      Yeh important interview point hai.
+      <br><br>
+      Boss collider large tha. Old quadtree insertion boundary-spanning objects ko child nodes me
+      recursively daalta ja raha tha, jis se <strong>stack overflow due to excessive recursion</strong> hua.
+      Crash report ne clearly dikhaya:
+      <br>
+      <code>Thread stack size exceeded due to excessive recursion</code>
+      <br><br>
+      Fix:
+      <br>
+      if object fully fits in exactly one child -> insert there
+      <br>
+      else -> keep it in current node
+      <br><br>
+      <span class="fun">Translation: boss ko zabardasti chaar dabbo me ghusana band kiya.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Collision response ka example?</div>
+    <div class="a">
+      Solid colliders overlap hon to separation by smallest axis:
+      <pre><code>if (overlapX &lt; overlapY) {
+    // separate on X
+} else {
+    // separate on Y
+}</code></pre>
+      Trigger colliders event create karte hain but physical push nahi karte.
+    </div>
+  </div>
+
+  <h2>6. Bullet System</h2>
+
+  <div class="card">
+    <div class="q">Q: BulletSystem kya karta hai?</div>
+    <div class="a">
+      Bullet spawn, travel, max range cleanup, collision-based damage, score updates, and destruction.
+      Bullets entities hain, koi special hardcoded projectile array nahi.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Player bullet nozzle issue kaise fix kiya?</div>
+    <div class="a">
+      Initially bullets center ya sideways offset se spawn ho rahe the, isliye visually nozzle se nahi lag rahe the.
+      Fix me player facing direction ke along forward muzzle offset use kiya:
+      <pre><code>Vector2 forward = Vector2(0.0f, -1.0f).rotated(transform.rotation);
+Vector2 muzzleOffset = forward * 28.0f;</code></pre>
+      Fir bullet spawn position = player position + muzzle offset.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Enemy bullet damage register nahi ho raha tha, why?</div>
+    <div class="a">
+      Major reason tha enemy bullet hitbox too skinny feel ho raha tha, so visual contact aur collision contact mismatch tha.
+      Fix me enemy bullet collider thoda enlarge kiya:
+      <pre><code>const float colliderWidth = fromPlayer ? 6.0f : 12.0f;
+const float colliderHeight = fromPlayer ? 12.0f : 20.0f;</code></pre>
+      Isse hit registration fairer feel hui.
+    </div>
+  </div>
+
+  <h2>7. Enemy AI</h2>
+
+  <div class="card">
+    <div class="q">Q: AI state machine kya tha?</div>
+    <div class="a">
+      Enemies use a simple but effective state machine:
+      <br>
+      Patrol
+      <br>
+      Chase
+      <br>
+      Attack
+      <br>
+      Dead
+      <br><br>
+      Transitions distance-based aur hysteresis-based the to avoid jitter.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Enemy types me difference kaise create kiya?</div>
+    <div class="a">
+      Har enemy type ke alag speed, radius, fire rate, damage, and behavior modifiers hain:
+      <br><br>
+      <strong>Grunt:</strong> basic pressure enemy
+      <br>
+      <strong>Flanker:</strong> player ke around offset path leta hai
+      <br>
+      <strong>Tank:</strong> slow but heavy and pushy
+      <br>
+      <strong>Sniper:</strong> long-range firing, stationary attack
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Difficulty-based aim logic kaise ki?</div>
+    <div class="a">
+      Difficulty ko pure HP sponge ya damage multiplier nahi banaya.
+      Aim behavior and engagement style tune kiya.
+      <br><br>
+      Easy:
+      wider aim error, less predictive shots
+      <br>
+      Medium:
+      moderate correction
+      <br>
+      Hard:
+      tighter aim but still intentionally imperfect
+      <br><br>
+      Example:
+      <pre><code>float angleError = aimErrorForDifficulty(difficultyIndex, enemy.type);
+float shotAngle = aimDirection.angle() + randomFloat(-angleError, angleError);</code></pre>
+      So bots human-like lagte hain, aimbot nahi.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Enemies passive kyun lag rahe the and how did we fix it?</div>
+    <div class="a">
+      Initially enemies mostly close-range attack state me hi fire kar rahe the.
+      Fix me chase state ke andar bhi ek <strong>pressure radius</strong> add kiya gaya.
+      Matlab woh aapke upar chipakne se pehle hi fire pressure create karte hain.
+      <br><br>
+      This made combat feel more like an actual shooter and less like “aao bhai pehle hug karte hain phir goli chalate hain”.
+    </div>
+  </div>
+
+  <h2>8. Boss System</h2>
+
+  <div class="card">
+    <div class="q">Q: Boss fight architecture kya thi?</div>
+    <div class="a">
+      BossSystem ek dedicated system tha.
+      Boss is a normal entity with extra components:
+      Transform, Velocity, Collider, Health, Boss, Sprite, Tag.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Boss phases ka logic?</div>
+    <div class="a">
+      Health thresholds-based:
+      <br>
+      Phase 1: hp &gt; 400
+      <br>
+      Phase 2: hp 201–400
+      <br>
+      Phase 3: hp &lt;= 200
+      <br><br>
+      Phase transition pe:
+      screenshake
+      <br>
+      hitstop
+      <br>
+      particles
+      <br>
+      explosion sound
+      <br>
+      movement and attack pattern escalation
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Boss attacks kya the?</div>
+    <div class="a">
+      Phase 1: spread shots
+      <br>
+      Phase 2: spiral burst
+      <br>
+      Phase 3: alternating spiral + charge
+      <br><br>
+      Goal yeh tha ki boss mechanically aur visually dono ways me escalate ho.
+    </div>
+  </div>
+
+  <h2>9. Wave System</h2>
+
+  <div class="card">
+    <div class="q">Q: Wave progression kaise built hua?</div>
+    <div class="a">
+      WaveSystem pre-defined configs use karta hai for early waves, then procedural scaling for later waves.
+      Wave 5 aur 10 boss waves hain.
+      <br><br>
+      Jab enemiesAlive 0 ho jata hai, then between-wave timer start hota hai, then next wave spawn hota hai.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Wave 3 ke baad enemies not spawning issue kya tha?</div>
+    <div class="a">
+      Us type ke issues usually count logic, waiting flag, boss active state, ya dead entity cleanup timing se aate hain.
+      We tightened the flow so dead enemies destroy hone ke baad wave count refresh hota hai and next wave reliably triggers.
+    </div>
+  </div>
+
+  <h2>10. Game Feel Systems</h2>
+
+  <div class="card">
+    <div class="q">Q: “Game feel” exactly kaise implement kiya?</div>
+    <div class="a">
+      Yeh project ka heart tha.
+      Implemented:
+      <br>
+      Hitstop
+      <br>
+      Screenshake
+      <br>
+      Hit flash
+      <br>
+      Death particles
+      <br>
+      Spatial audio
+      <br><br>
+      Yeh sab utility functions ke through trigger hote hain from collisions, enemy death, boss phase change, player hit, etc.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Hitstop ka implementation kya tha?</div>
+    <div class="a">
+      Dedicated world hitstop entity par timer add karte hain. Physics and AI us timer ko respect karte hain.
+      So when hitstop active:
+      <br>
+      physics freeze
+      <br>
+      AI freeze
+      <br>
+      render/UI still continue
+      <br><br>
+      Isse impact heavy lagta hai.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Screenshake ka logic?</div>
+    <div class="a">
+      Camera entity me ScreenshakeComponent store hota hai with intensity, duration, timer, offset.
+      Render update me decaying random offset generate hota hai.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Spatial audio kaise kiya?</div>
+    <div class="a">
+      Sound source aur player ke world position ke basis par volume aur left/right panning calculate kiya.
+      <pre><code>float pan = clamp((soundX - playerX) / maxRange, -1.0f, 1.0f);
+Mix_SetPanning(channel, leftVol, rightVol);</code></pre>
+    </div>
+  </div>
+
+  <h2>11. Menus, Pause, Leaderboard</h2>
+
+  <div class="card">
+    <div class="q">Q: Why add menu, difficulty, name entry, leaderboard?</div>
+    <div class="a">
+      Because “playable prototype” aur “presentable portfolio game” me farq hota hai.
+      Game ko feel complete banana tha.
+      So:
+      <br>
+      name entry
+      <br>
+      difficulty selection
+      <br>
+      start menu
+      <br>
+      pause menu
+      <br>
+      restart flow
+      <br>
+      persistent leaderboard
+      <br>
+      top score to beat
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Leaderboard persistence kaise ki?</div>
+    <div class="a">
+      Simple text file based persistence:
+      <pre><code>name|score|wave|difficulty</code></pre>
+      On load:
+      parse file, sort descending, keep top 3.
+      On submit:
+      append current score, sort, trim to 3, save back.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Pause me score save kaise handle kiya?</div>
+    <div class="a">
+      Pause screen gives:
+      <br>
+      Resume
+      <br>
+      Save score and go to menu
+      <br>
+      Save score and exit
+      <br><br>
+      If run active hai and player exits from pause or closes app, current score submit hota hai before leaving.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: Esc app close bug kya tha?</div>
+    <div class="a">
+      Engine layer me hardcoded <code>Esc =&gt; running = false</code> tha.
+      Is wajah se scene-level pause logic bypass ho raha tha.
+      Fix: remove global escape-close behavior and route Esc to GameScene pause state.
+    </div>
+  </div>
+
+  <h2>12. Build System</h2>
+
+  <div class="card">
+    <div class="q">Q: CMake setup me kya notable tha?</div>
+    <div class="a">
+      CMake used with FetchContent for:
+      SDL2
+      SDL2_image
+      SDL2_mixer
+      SDL2_ttf
+      <br><br>
+      Assets post-build copy command bhi set kiya gaya so binary ke paas runtime assets available ho.
+      Warnings high rakhe on MSVC and Clang/GCC.
+    </div>
+  </div>
+
+  <h2>13. Great Interview Answers Ready-to-Speak</h2>
+
+  <div class="card">
+    <div class="q">Q: What was the hardest bug you solved?</div>
+    <div class="a">
+      The hardest bug was a boss-wave crash caused by excessive recursion in the quadtree.
+      The boss had a large collider, and the previous insertion logic kept trying to push a boundary-spanning object deeper into child nodes.
+      I used the macOS crash report to identify a stack overflow in <code>Quadtree::insertInternal()</code>, then changed the quadtree logic so objects that do not fully fit inside a single child remain in the current node.
+      That fixed the crash and made the spatial partitioning more correct.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: What did you optimize for in this project?</div>
+    <div class="a">
+      I optimized for maintainable gameplay systems and good combat feel.
+      Instead of just rendering sprites and moving entities, I focused on making the architecture scalable and the moment-to-moment feedback satisfying.
+      That’s why I used ECS, fixed timestep updates, quadtree queries, and dedicated game-feel systems.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Q: If you had more time, what would you improve?</div>
+    <div class="a">
+      I would add a level editor, more enemy archetypes, better visual effects like GPU particles and trails, more animation states, and improved balancing tools.
+      I would also add analytics or debug overlays for AI tuning and combat telemetry.
+    </div>
+  </div>
+
+  <h2>14. Advanced Interview Questions From This Project</h2>
+
+  <div class="card">
+    <div class="q">Advanced Q1: Why is ECS a better fit here than deep inheritance?</div>
+    <div class="a">
+      Because entity behavior is composition-driven, not taxonomy-driven.
+      Bullets, pickups, enemies, boss, particles all reuse overlapping data patterns.
+      ECS reduces brittle inheritance chains and keeps systems data-oriented.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Advanced Q2: What problems does fixed timestep solve that variable timestep doesn’t?</div>
+    <div class="a">
+      Fixed timestep improves determinism, stabilizes physics/cooldowns/collision behavior, and makes balancing more consistent across different frame rates.
+      Variable timestep can introduce inconsistent gameplay feel and tunneling-like issues.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Advanced Q3: Why was render interpolation still needed if physics already works?</div>
+    <div class="a">
+      Physics correctness and render smoothness are different concerns.
+      Interpolation hides the visible stepping between fixed simulation updates and makes movement/camera visually smoother.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Advanced Q4: What is the tradeoff of quadtree vs brute-force collision?</div>
+    <div class="a">
+      Quadtree reduces average collision candidate count and scales better with many entities.
+      Tradeoff is implementation complexity and edge cases like large objects spanning multiple regions.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Advanced Q5: How did you keep enemy difficulty fair instead of frustrating?</div>
+    <div class="a">
+      I scaled aim confidence and engagement behavior rather than just increasing raw damage or perfect tracking.
+      Easy enemies miss more and predict less; hard enemies are more consistent but still intentionally imperfect.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Advanced Q6: How would you prevent bullet tunneling at higher projectile speeds?</div>
+    <div class="a">
+      I would use swept collision tests, raycast-style segment checks between previous and current positions, or sub-stepping for fast projectiles.
+      Current AABB overlap is acceptable for this scale, but swept tests would be the next upgrade.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Advanced Q7: Why use hitstop as world-state instead of per-system hacks?</div>
+    <div class="a">
+      A central hitstop state gives one source of truth.
+      Physics and AI can freeze consistently while render/UI continue, which is cleaner and easier to reason about than sprinkling pause flags everywhere.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Advanced Q8: How would you make this architecture multiplayer-friendly?</div>
+    <div class="a">
+      I would push further toward deterministic simulation, isolate side effects more cleanly, add input recording/rollback-safe structures, and rethink audio/render-only systems as presentation layers on top of deterministic game state.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Advanced Q9: What is one example of turning user feedback into an engineering change?</div>
+    <div class="a">
+      Player movement and enemy pressure were both reshaped through feedback.
+      The project moved from rotate/thrust controls to direct top-down movement, and enemy AI was changed to engage from better distances with softer aim behavior to feel more like a normal shooter.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q">Advanced Q10: What did this project prove about you as an engineer?</div>
+    <div class="a">
+      It showed that I can design gameplay systems end-to-end, debug real runtime failures, iterate based on feel and feedback, and ship a complete interactive product rather than isolated demo features.
+    </div>
+  </div>
+
+  <h2>15. Super Short 30-Second Answer</h2>
+  <div class="card">
+    <div class="q">Q: Give me the 30-second explanation.</div>
+    <div class="a">
+      PratStrike is a 2D top-down shooter I built in C++ and SDL2.
+      I designed it using an ECS architecture with fixed-timestep updates, quadtree-based collision, enemy AI, boss phases, and multiple game-feel systems like hitstop and screenshake.
+      I also built full menu, pause, difficulty, and leaderboard flow, and debugged production-style issues like boss-wave crashes and collision fairness.
+    </div>
+  </div>
+
+  <h2>16. Super Short 10-Second Funny Answer</h2>
+  <div class="card">
+    <div class="q">Q: Bhai simple bol, kya banaya?</div>
+    <div class="a">
+      C++ me ek top-down shooter banaya jisme player, enemies, boss, AI, bullets, menus, score, pause sab hai.
+      Matlab game bhi banaya aur bugs ne bhi mujhe character development diya.
+    </div>
+  </div>
+
+</body>
+</html>
