@@ -106,7 +106,8 @@ section{margin-top:80px}
 .exp-list li strong{color:var(--fg);font-weight:600}
 
 /* PROJECTS */
-.proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.proj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(max-width:640px){.proj-grid{grid-template-columns:1fr}.proj-card[style*="grid-column"]{grid-column:span 1!important}}
 .proj-card{background:var(--card2);border:1px solid rgba(0,245,255,.1);padding:24px;position:relative;transition:all .25s;overflow:hidden}
 .proj-card::after{content:'';position:absolute;bottom:0;right:0;width:48px;height:48px;border-bottom:2px solid var(--cyan);border-right:2px solid var(--cyan);opacity:.3;transition:opacity .2s}
 .proj-card:hover{border-color:rgba(0,245,255,.4);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,245,255,.06)}
@@ -392,15 +393,61 @@ section{margin-top:80px}
       <h2>Projects</h2>
     </div>
     <div class="proj-grid">
-      <div class="proj-card">
-        <span class="proj-icon">&#9881;</span>
-        <p class="proj-title">2D Physics Engine with CCD</p>
+
+      <!-- ★ PRATSTRIKE — FEATURED -->
+      <div class="proj-card" style="border-color:rgba(255,45,120,.35);grid-column:span 2;background:linear-gradient(135deg,#12121f 80%,rgba(255,45,120,.05))">
+        <span class="proj-icon">&#127918;</span>
+        <p class="proj-title" style="font-size:26px;color:var(--pink)">PratStrike &mdash; 2D Action Shooter</p>
         <div class="proj-tech">
-          <span class="tag">C++</span><span class="tag">AABB</span><span class="tag">Rigid Body</span><span class="tag">TOI</span>
+          <span class="tag">C++</span><span class="tag">SDL2</span><span class="tag">ECS</span><span class="tag">Quadtree</span><span class="tag">Object Pool</span><span class="tag">Spatial Audio</span>
         </div>
-        <p class="proj-desc">Custom 2D rigid body physics engine with Continuous Collision Detection using Swept AABB and Time of Impact. Handles circle&ndash;circle, circle&ndash;polygon, and polygon&ndash;polygon collisions.</p>
-        <div class="proj-links"><a class="plink" href="https://github.com/Pratyanshprateek" target="_blank">&rarr; GITHUB</a></div>
+        <p class="proj-desc" style="font-size:14px;color:#b0b0d0">A 2D top-down action shooter built in C++ with SDL2, engineered for game feel, responsiveness, and robust systems design. Custom ECS with sparse-set storage drives all entities; a fixed-timestep physics loop with render interpolation delivers locked 60 FPS. Collision is accelerated via a Quadtree-based AABB broadphase. Polish details include a hitstop system (40–100 ms by impact weight), screenshake with intensity decay, per-hit i-frames with flicker rendering, spatial audio panning via SDL2_mixer, multi-phase boss AI on a state machine, and an object pool allocator for bullet entities.</p>
+        <div class="proj-links">
+          <a class="plink" href="https://github.com/Pratyanshprateek/PratStrike" target="_blank">&rarr; GITHUB</a>
+          <a class="plink" href="https://pratyanshprateek.github.io/uploads/PratStrike.mp4" target="_blank">&rarr; DEMO</a>
+        </div>
       </div>
+
+      <!-- SUDOKU GUI -->
+      <div class="proj-card" style="border-color:rgba(0,245,255,.25);background:linear-gradient(135deg,#12121f 80%,rgba(0,245,255,.04))">
+        <span class="proj-icon">&#9643;</span>
+        <p class="proj-title" style="color:var(--cyan)">Sudoku GUI</p>
+        <div class="proj-tech">
+          <span class="tag">C++</span><span class="tag">SFML</span><span class="tag">Backtracking</span><span class="tag">Puzzle Gen</span>
+        </div>
+        <p class="proj-desc">A complete desktop Sudoku experience with a production-quality puzzle engine. Dark-themed interface with clickable cells, keyboard controls, difficulty switching, timer tracking, validation feedback, and unique-solution puzzle generation. Cross-platform (macOS, Linux, Windows) with asset paths resolved relative to the executable.</p>
+        <div class="proj-links">
+          <a class="plink" href="https://github.com/Pratyanshprateek/Sudoku" target="_blank">&rarr; GITHUB</a>
+        </div>
+      </div>
+
+      <!-- 2D PHYSICS ENGINE — FEATURED -->
+      <div class="proj-card" style="border-color:rgba(57,255,20,.25);background:linear-gradient(135deg,#12121f 80%,rgba(57,255,20,.04))">
+        <span class="proj-icon">&#9881;</span>
+        <p class="proj-title" style="color:var(--green)">2D Physics Engine with CCD</p>
+        <div class="proj-tech">
+          <span class="tag">C++</span><span class="tag">AABB</span><span class="tag">Swept CCD</span><span class="tag">Rigid Body</span><span class="tag">TOI</span>
+        </div>
+        <p class="proj-desc">Custom 2D rigid-body physics engine with Continuous Collision Detection using Swept AABB and Time-of-Impact solving. Handles circle–circle, circle–polygon, and polygon–polygon collisions with accurate resolution &mdash; zero tunnelling at high velocities.</p>
+        <div class="proj-links">
+          <a class="plink" href="https://github.com/Pratyanshprateek" target="_blank">&rarr; GITHUB</a>
+        </div>
+      </div>
+
+      <!-- MEDICAL IMAGE CLASSIFICATION — ViT -->
+      <div class="proj-card" style="border-color:rgba(255,107,0,.25);background:linear-gradient(135deg,#12121f 80%,rgba(255,107,0,.04))">
+        <span class="proj-icon">&#129504;</span>
+        <p class="proj-title" style="color:var(--orange)">Medical Image Classification — ViT</p>
+        <div class="proj-tech">
+          <span class="tag">Python</span><span class="tag">Vision Transformer</span><span class="tag">HuggingFace</span><span class="tag">PyTorch</span><span class="tag">Jupyter</span>
+        </div>
+        <p class="proj-desc">Fine-tuned <code style="color:var(--cyan);font-size:11px">google/vit-base-patch16-224</code> to classify chest X-rays as NORMAL or PNEUMONIA. End-to-end pipeline: training, evaluation, Grad-CAM visualisation, and model checkpointing. Includes a standalone inference script for single X-ray prediction from a saved checkpoint.</p>
+        <div class="proj-links">
+          <a class="plink" href="https://github.com/Pratyanshprateek/vision_transformer" target="_blank">&rarr; GITHUB</a>
+        </div>
+      </div>
+
+      <!-- DOG BREED CLASSIFIER -->
       <div class="proj-card">
         <span class="proj-icon">&#128062;</span>
         <p class="proj-title">Dog Breed Classifier</p>
@@ -409,10 +456,11 @@ section{margin-top:80px}
         </div>
         <p class="proj-desc">End-to-end deep learning web app classifying 120+ dog breeds from uploaded images. Fine-tuned MobileNetV2 from TensorFlow Hub on a labelled multi-class dataset.</p>
         <div class="proj-links">
-          <a class="plink" href="https://github.com/Pratyanshprateek" target="_blank">&rarr; GITHUB</a>
-          <a class="plink" href="#" target="_blank">&rarr; DEMO</a>
+          <a class="plink" href="https://github.com/Pratyanshprateek/End-to-End-Dog-Breed-Classification" target="_blank">&rarr; GITHUB</a>
         </div>
       </div>
+
+      <!-- SPOTIFY CLONE -->
       <div class="proj-card">
         <span class="proj-icon">&#9835;</span>
         <p class="proj-title">Spotify Clone</p>
@@ -421,9 +469,11 @@ section{margin-top:80px}
         </div>
         <p class="proj-desc">Feature-complete Spotify UI clone with play, pause, forward, backward, and track selection. Clean vanilla front-end with seamless user experience.</p>
         <div class="proj-links">
-          <a class="plink" href="https://pratyanshprateek.github.io/spotify-clone/">&rarr; GITHUB</a>
+          <a class="plink" href="https://github.com/Pratyanshprateek/spotify-clone" target="_blank">&rarr; GITHUB</a>
+          <a class="plink" href="https://pratyanshprateek.github.io/spotify-clone/" target="_blank">&rarr; DEMO</a>
         </div>
       </div>
+
     </div>
   </section>
 
@@ -509,7 +559,7 @@ section{margin-top:80px}
 
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ── BOOT SCREEN ── */
 const bootLines = [
   'INITIALIZING PLAYER DATA...',
@@ -571,11 +621,19 @@ reveals.forEach(r=>obs.observe(r));
 /* ── WANTED STARS on scroll ── */
 window.addEventListener('scroll',()=>{
   const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-  const lit = Math.ceil(pct * 5);
-  document.querySelectorAll('.star').forEach((s,i)=>{
-    s.classList.toggle('lit', i < lit);
-  });
+  const stars = document.querySelectorAll('.star');
+  const lit = Math.round(pct * stars.length);
+  stars.forEach((s,i)=> s.classList.toggle('lit', i < lit));
 });
+
+/* ── HUD BARS animate on load ── */
+setTimeout(()=>{
+  document.querySelectorAll('.hud-bar-fill').forEach(b=>{
+    const w = b.style.width;
+    b.style.width = '0%';
+    setTimeout(()=>{ b.style.width = w; }, 100);
+  });
+}, 600);
 </script>
 </body>
 </html>
